@@ -24,6 +24,7 @@ def get_most_popular_artist_from_streaming_history(
 
     for i in range(0, len(streaming_history)):
         artist_name = streaming_history[i]["artistName"]
+
         
         if artist_name in artist_streams_count:
             artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
@@ -73,6 +74,56 @@ def read_json_data_from_files_in_common_folder_by_prefix(base_dir, prefix):
     
     return data
 
+
+# TODO: Query against API to establish that names in results are artist names
+def get_list_of_featured_artists_from_track_name(
+    track_name=""):
+    
+    # Bigger Than You (feat. Drake & Quavo)
+
+    if len(track_name) < 1:
+        return []
+    
+    if "(" not in track_name and "[" not in track_name:
+        return []
+    
+
+    featured_artists = []
+
+    if "feat" in track_name:
+        featured_artists_str = track_name.split("(")[1][:-1][6:]
+    elif "with" in track_name:
+        featured_artists_str = track_name.split("with")[-1].strip()
+        if ")" == featured_artists_str[-1] or "]" == featured_artists_str[-1]:
+            featured_artists_str = featured_artists_str[:-1].strip()
+    else:
+        featured_artists_str = track_name.split("(")[-1][:-1]
+    
+    featured_artists = get_artists_from_string_with_multiple_artists(featured_artists_str)
+
+    return featured_artists
+
+def get_artists_from_string_with_multiple_artists(featured_artists_str):
+    featured_artists = []
+    
+    if "&" in featured_artists_str:
+        temp_artists_split = featured_artists_str.split("&")
+        featured_artists.append(temp_artists_split[-1].strip())
+
+        featured_artists_str = temp_artists_split[0]
+
+        if "," not in featured_artists_str:
+            featured_artists.append(featured_artists_str.strip())
+        else:
+            artists = featured_artists_str.split(",")
+
+            for artist in artists:
+                featured_artists.append(artist.strip())
+    else:
+        featured_artists = [featured_artists_str]
+    
+    return featured_artists    
+    
 class DataNotFound(Exception):
     def __init__(self, message):
         self.message = message

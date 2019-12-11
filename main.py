@@ -3,14 +3,18 @@
 import json
 import os
 
+from utilities import *
 # TODO: If two or more artists can share the same artist name:
 #           change logic
+
+STREAMING_HISTORY = read_json_data_from_files_in_common_folder_by_prefix("./", "StreamingHistory")
+MILLISECONDS_IN_A_MINUTE = 60000
 
 def get_most_popular_artist_from_streaming_history(
     base_dir="./",
     streaming_files_prefix="StreamingHistory"):
 
-    streaming_history = read_json_data_from_files_in_common_folder_by_prefix(base_dir, streaming_files_prefix)    
+    streaming_history = STREAMING_HISTORY
 
     if len(streaming_history) < 1:
         raise DataNotFound("Unable to read data from streaming history files")
@@ -26,7 +30,7 @@ def get_most_popular_artist_from_streaming_history(
 
         featured_artists = get_list_of_featured_artists_from_track_name(streaming_history[i]["trackName"])
 
-        for artist_name in featured_artists:
+        for artist_name in featured_artists: 
             if artist_name in artist_streams_count:
                 artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
             else:
@@ -48,7 +52,7 @@ def get_number_of_times_listened_to_artist_by_name(
     base_dir="./",
     streaming_files_prefix="StreamingHistory"):
 
-    streaming_history = read_json_data_from_files_in_common_folder_by_prefix(base_dir, streaming_files_prefix)    
+    streaming_history = STREAMING_HISTORY
 
     if len(streaming_history) < 1:
         raise DataNotFound("Unable to read data from streaming history files")
@@ -63,17 +67,26 @@ def get_number_of_times_listened_to_artist_by_name(
 
     return artist_stream_count
 
-def read_json_data_from_files_in_common_folder_by_prefix(base_dir, prefix):
-    data = []
 
-    for file in os.listdir(base_dir):
-        if 'json' in file and prefix in file:
-            json_path = os.path.join(base_dir, file)
-            
-            with open(json_path, 'r') as f:
-                data = data + json.load(f)
+def get_number_of_minutes_listened_to_artist(
+    artist_name="",
+    base_dir="./",
+    streaming_files_prefix="StreamingHistory"):
     
-    return data
+    streaming_history = STREAMING_HISTORY
+
+    if len(streaming_history) < 1:
+        raise DataNotFound("Unable to read data from streaming history files")
+
+    milliseconds_listened_to_artist = 0
+
+    for streaming_record in streaming_history:
+        if streaming_record["artistName"] == artist_name or \
+            artist_name in streaming_record["trackName"]:
+            print(str(streaming_record) + "\n\n")
+            milliseconds_listened_to_artist = milliseconds_listened_to_artist + streaming_record["msPlayed"]
+    
+    return milliseconds_listened_to_artist // MILLISECONDS_IN_A_MINUTE
 
 # TODO: Query against API to establish that names in results are artist names
 def get_list_of_featured_artists_from_track_name(
@@ -125,5 +138,6 @@ class DataNotFound(Exception):
 
 if __name__ == "__main__":
     print("The most popular artist is:", get_most_popular_artist_from_streaming_history())
-    print("The number of times you played 21 Savage including features is:",
-        get_number_of_times_listened_to_artist_by_name("21 Savage"))
+    print("The number of times you played Drake is:",
+        get_number_of_times_listened_to_artist_by_name("Drake"))
+    print("You listened to Drake for {} minutes.".format(get_number_of_minutes_listened_to_artist("Drake")))

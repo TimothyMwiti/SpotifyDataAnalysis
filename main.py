@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
-# 
+ 
 import json
 import os
 
-FILE_NAME = "StreamingHistory1.json"
-
 # TODO: If two or more artists can share the same artist name:
 #           change logic
-
-# TODO: Missing logic for crediting artist when streamed from
-#       a song that they are featured in
 
 def get_most_popular_artist_from_streaming_history(
     base_dir="./",
@@ -80,20 +75,13 @@ def read_json_data_from_files_in_common_folder_by_prefix(base_dir, prefix):
     
     return data
 
-
 # TODO: Query against API to establish that names in results are artist names
 def get_list_of_featured_artists_from_track_name(
     track_name=""):
-    
-    # Bigger Than You (feat. Drake & Quavo)
 
-    if len(track_name) < 1:
+    if len(track_name) < 1 or ("(" not in track_name and "[" not in track_name):
         return []
     
-    if "(" not in track_name and "[" not in track_name:
-        return []
-    
-
     featured_artists = []
 
     if "feat" in track_name:

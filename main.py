@@ -2,9 +2,9 @@
  
 import json
 import os
-from utilities import *
+from utilities import Utilities
 
-STREAMING_HISTORY = read_json_data_from_files_in_common_folder_by_prefix("./", "StreamingHistory")
+STREAMING_HISTORY = Utilities.read_json_data_from_files_in_common_folder_by_prefix("./", "StreamingHistory")
 MILLISECONDS_IN_A_MINUTE = 60000
 
 # TODO: If two or more artists can share the same artist name:
@@ -27,7 +27,7 @@ def get_most_popular_artist_from_streaming_history(
         else:
             artist_streams_count[artist_name] = 1
 
-        featured_artists = get_list_of_featured_artists_from_track_name(streaming_history[i]["trackName"])
+        featured_artists = Utilities.get_list_of_featured_artists_from_track_name(streaming_history[i]["trackName"])
 
         for artist_name in featured_artists: 
             if artist_name in artist_streams_count:

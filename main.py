@@ -23,14 +23,20 @@ def get_most_popular_artist_from_streaming_history(
     artist_streams_count = {}
 
     for i in range(0, len(streaming_history)):
-        artist_name = streaming_history[i]["artistName"]
-
-        
+        artist_name = streaming_history[i]["artistName"]       
         if artist_name in artist_streams_count:
             artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
         else:
             artist_streams_count[artist_name] = 1
-            
+
+        featured_artists = get_list_of_featured_artists_from_track_name(streaming_history[i]["trackName"])
+
+        for artist_name in featured_artists:
+            if artist_name in artist_streams_count:
+                artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
+            else:
+                artist_streams_count[artist_name] = 1
+                        
 
     most_popular_artist = next(iter(artist_streams_count))
     most_popular_artist_count = artist_streams_count[most_popular_artist]

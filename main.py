@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
- 
+
 import json
 import os
 from utilities import Utilities
@@ -21,7 +21,7 @@ def get_most_popular_artist_from_streaming_history(
     artist_streams_count = {}
 
     for i in range(0, len(streaming_history)):
-        artist_name = streaming_history[i]["artistName"]       
+        artist_name = streaming_history[i]["artistName"]
         if artist_name in artist_streams_count:
             artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
         else:
@@ -29,12 +29,12 @@ def get_most_popular_artist_from_streaming_history(
 
         featured_artists = Utilities.get_list_of_featured_artists_from_track_name(streaming_history[i]["trackName"])
 
-        for artist_name in featured_artists: 
+        for artist_name in featured_artists:
             if artist_name in artist_streams_count:
                 artist_streams_count[artist_name] = artist_streams_count[artist_name] + 1
             else:
                 artist_streams_count[artist_name] = 1
-                        
+
 
     most_popular_artist = next(iter(artist_streams_count))
     most_popular_artist_count = artist_streams_count[most_popular_artist]
@@ -43,7 +43,7 @@ def get_most_popular_artist_from_streaming_history(
         if artist_stream_count > most_popular_artist_count:
             most_popular_artist = artist_name
             most_popular_artist_count = artist_streams_count[most_popular_artist]
-    
+
     return most_popular_artist
 
 def get_number_of_times_listened_to_artist(
@@ -68,7 +68,7 @@ def get_number_of_minutes_listened_to_artist(
     artist_name="",
     base_dir="./",
     streaming_files_prefix="StreamingHistory"):
-    
+
     streaming_history = STREAMING_HISTORY
 
     if len(streaming_history) < 1:
@@ -79,7 +79,7 @@ def get_number_of_minutes_listened_to_artist(
     for streaming_record in streaming_history:
         if artist_appears_in_streaming_record(artist_name, streaming_record):
             milliseconds_listened_to_artist = milliseconds_listened_to_artist + streaming_record["msPlayed"]
-    
+
     return milliseconds_listened_to_artist // MILLISECONDS_IN_A_MINUTE
 
 def artist_appears_in_streaming_record(artist_name, streaming_record):

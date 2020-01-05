@@ -12,17 +12,17 @@ class Utilities:
         for file in os.listdir(base_dir):
             if 'json' in file and prefix in file:
                 json_path = os.path.join(base_dir, file)
-                
+
                 with open(json_path, 'r') as f:
                     data = data + json.load(f)
-        
-        return data  
 
-    
+        return data
+
+
     @staticmethod
     def get_artists_from_string_with_multiple_artists(featured_artists_str):
         featured_artists = []
-        
+
         if "&" in featured_artists_str:
             temp_artists_split = featured_artists_str.split("&")
             featured_artists.append(temp_artists_split[-1].strip())
@@ -38,7 +38,7 @@ class Utilities:
                     featured_artists.append(artist.strip())
         else:
             featured_artists = [featured_artists_str]
-        
+
         return featured_artists
 
 
@@ -48,7 +48,7 @@ class Utilities:
 
         if len(track_name) < 1 or ("(" not in track_name and "[" not in track_name):
             return []
-        
+
         featured_artists = []
 
         if "feat" in track_name:
@@ -59,7 +59,7 @@ class Utilities:
                 featured_artists_str = featured_artists_str[:-1].strip()
         else:
             featured_artists_str = track_name.split("(")[-1][:-1]
-        
+
         featured_artists = Utilities.get_artists_from_string_with_multiple_artists(featured_artists_str)
 
         return featured_artists

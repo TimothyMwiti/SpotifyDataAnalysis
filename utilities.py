@@ -2,8 +2,37 @@
 
 import json
 import os
+import requests
 
 class Utilities:
+
+    @staticmethod
+    def get_song_duration(search_query):
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': '',
+        }
+
+        params = (
+            ('q', search_query),
+            ('type', 'track'),
+            ('limit', '1'),
+            ('offset', '0'),
+        )
+
+        response = requests.get('https://api.spotify.com/v1/search', headers=headers, params=params)
+
+        if response.status_code != 200:
+            print("Error getting a response")
+            return "Error getting a response"
+
+        if len(response.json()['tracks']['items']) < 1:
+            return "Could not find song"
+
+        return response.json()['tracks']['items'][0]['duration_ms']
+
+        
 
     @staticmethod
     def read_json_data_from_files_in_common_folder_by_prefix(base_dir, prefix):

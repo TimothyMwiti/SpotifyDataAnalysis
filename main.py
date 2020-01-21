@@ -3,8 +3,11 @@
 import json
 import os
 from utilities import Utilities
+import requests
 
-STREAMING_HISTORY = Utilities.read_json_data_from_files_in_common_folder_by_prefix("./", "StreamingHistory")
+
+
+STREAMING_HISTORY = Utilities.read_json_data_from_files_in_common_folder_by_prefix("./StreamingData", "StreamingHistory")
 MILLISECONDS_IN_A_MINUTE = 60000
 
 # TODO: If two or more artists can share the same artist name:
@@ -94,7 +97,24 @@ class DataNotFound(Exception):
 
 
 if __name__ == "__main__":
-    print("The most popular artist is:", get_most_popular_artist_from_streaming_history())
-    print("The number of times you played Drake is:",
-        get_number_of_times_listened_to_artist("Drake"))
-    print("You listened to Drake for {} minutes.".format(get_number_of_minutes_listened_to_artist("Drake")))
+    streaming_history = STREAMING_HISTORY
+
+    not_found = 0
+
+    for streaming_record in streaming_history:
+
+        song_duration = Utilities.get_song_duration(streaming_record["trackName"] + " " + streaming_record["artistName"])
+
+
+        # print(Utilities.get_song_duration(streaming_record["trackName"] + " " + streaming_record["artistName"]))
+
+
+        if(song_duration == "Could not find song"):
+
+            print(streaming_record["trackName"] + " " + streaming_record["artistName"] + "\n")
+            not_found = not_found + 1
+
+    
+    print(not_found)
+
+    

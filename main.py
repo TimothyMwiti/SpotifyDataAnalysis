@@ -4,8 +4,7 @@ import json
 import os
 from utilities import Utilities
 import requests
-
-
+import time
 
 STREAMING_HISTORY = Utilities.read_json_data_from_files_in_common_folder_by_prefix("./StreamingData", "StreamingHistory")
 MILLISECONDS_IN_A_MINUTE = 60000
@@ -99,22 +98,42 @@ class DataNotFound(Exception):
 if __name__ == "__main__":
     streaming_history = STREAMING_HISTORY
 
-    not_found = 0
+    song_query_dict = {}
+
+    missing_songs = {}
+
+    start_time = time.time()
+
+    queries_processed = 0
+
+    print("Running queries...")
 
     for streaming_record in streaming_history:
+        query_string = streaming_record["trackName"] + " " + streaming_record["artistName"]
 
-        song_duration = Utilities.get_song_duration(streaming_record["trackName"] + " " + streaming_record["artistName"])
+        if query_string in song_query_dict.keys() or query_string in missing_songs.keys():
+            continue
+        else:
+            queries_processed = queries_processed + 1
+
+            song_duration = Utilities.get_song_duration_spotipy(query_string)
+            
+            if song_duration != "Could not find song":
+                song_query_dict[query_string] = song_duration
+            else:
+                missing_songs[query_string] = "Missing"
 
 
-        # print(Utilities.get_song_duration(streaming_record["trackName"] + " " + streaming_record["artistName"]))
-
-
-        if(song_duration == "Could not find song"):
-
-            print(streaming_record["trackName"] + " " + streaming_record["artistName"] + "\n")
-            not_found = not_found + 1
-
+    with open("song_durations.json", 'w', encoding='utf-8') as f:
+        json.dump(song_query_dict, f, ensure_ascii=False, indent=4)
     
-    print(not_found)
+    with open("missing_songs.json", 'w', encoding='utf-8') as f:
+        json.dump(missing_songs, f, ensure_ascii=False, indent=4)
 
+    end_time = time.time()
+    print("Start time:", start_time)
+    print("End time:", end_time)
+    print("Time taken:", end_time - start_time)
+
+    print("No. of Queries Processed:", queries_processed)
     

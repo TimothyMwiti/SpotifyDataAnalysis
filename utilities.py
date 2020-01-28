@@ -3,6 +3,38 @@
 import json
 import os
 import requests
+import sys
+
+import spotipy
+import spotipy.util as util
+
+if len(sys.argv) > 1:
+    username = sys.argv[1]
+else:
+    username = "mwiti"
+    # print("Please provide a username.")
+    # sys.exit()
+
+SCOPE = ','.join([
+    'user-modify-playback-state',
+    'user-read-playback-state',
+    'user-read-currently-playing'
+])
+
+SPOTIFY_OAUTH = util.prompt_for_user_token(
+    username,
+    redirect_uri="http://localhost/",
+    scope=SCOPE)
+
+
+SPOTIFY_DAO = None
+
+if SPOTIFY_OAUTH:
+    SPOTIFY_DAO = spotipy.Spotify(auth=SPOTIFY_OAUTH)
+else:
+    "Could not initialize Spotify DAO"
+    sys.exit()
+
 
 class Utilities:
 
@@ -32,7 +64,18 @@ class Utilities:
 
         return response.json()['tracks']['items'][0]['duration_ms']
 
+
+    @staticmethod
+    def get_song_duration_spotipy(search_query):
+        limit = 1
         
+        response = SPOTIFY_DAO.search(search_query, limit)
+
+        if len(response['tracks']['items']) > 0:
+            return response['tracks']['items'][0]['duration_ms']
+        
+        return "Could not find song"
+
 
     @staticmethod
     def read_json_data_from_files_in_common_folder_by_prefix(base_dir, prefix):
